@@ -2,8 +2,8 @@ services:
   postgres:
     image: 'postgres:latest'
     environment:
-      - 'POSTGRES_DB=mydatabase'
-      - 'POSTGRES_PASSWORD=secret'
-      - 'POSTGRES_USER=myuser'
+      - 'POSTGRES_DB=foodmarkt'
+      - 'POSTGRES_PASSWORD=5AgsC8dSHmtGlbJf4RCHwySInIkVKENg3NqtM8bi6eo='
+      - 'POSTGRES_USER=admin'
     ports:
       - '5432'

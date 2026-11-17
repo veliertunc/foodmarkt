@@ -1,0 +1,10 @@
+{
+  "name": "api",
+  "private": true,
+  "scripts": {
+    "dev": "./gradlew bootRun",
+    "start": "java -jar build/libs/foodmarkt-0.0.1-SNAPSHOT.jar",
+    "package": "./gradlew bootJar",
+    "test": "./gradlew test"
+  }
+}
