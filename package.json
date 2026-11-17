@@ -3,10 +3,17 @@
   "private": true,
   "scripts": {
     "build": "turbo run build",
-    "dev": "turbo run dev",
+    "dev": "node --env-file-if-exists=.env --run dev:turbo --",
+    "dev:turbo": "turbo run dev",
     "lint": "turbo run lint",
     "check-types": "turbo run check-types",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "api:gradle": "node -e \"const { spawnSync } = require('node:child_process'); const windows = process.platform === 'win32'; const args = process.argv.slice(1); const result = spawnSync(windows ? 'cmd.exe' : 'sh', windows ? ['/d', '/c', 'gradlew.bat', ...args] : ['./gradlew', ...args], { cwd: 'apps/api', stdio: 'inherit' }); if (result.error) throw result.error; process.exitCode = result.status ?? 1;\" --",
+    "api:dev": "pnpm run api:gradle bootRun --args=--spring.profiles.active=dev",
+    "api:test": "pnpm run api:gradle test",
+    "api:build": "pnpm run api:gradle build",
+    "api:package": "pnpm run api:gradle bootJar",
+    "api:clean": "pnpm run api:gradle clean"
   },
   "devDependencies": {
     "pnpm": "12.16.1",

@@ -1,0 +1,8 @@
+{
+  "extends": ["//"],
+  "tasks": {
+    "dev": {
+      "passThroughEnv": ["JAVA_HOME", "GRADLE_USER_HOME", "SERVER_PORT"]
+    }
+  }
+}
