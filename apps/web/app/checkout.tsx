@@ -5,9 +5,12 @@ import { submitOrder } from "./order-action";
 import type { OrderResult, Product } from "./store-api";
 
 const price = new Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" });
-const fieldClass = "w-full rounded-md border border-amber-900/25 bg-white px-3 py-2";
+const fieldClass = "mt-1 w-full rounded-md border border-stone-300 bg-white px-3 py-2";
 
-export function Checkout({ products }: { products: Product[] }) {
+export function Checkout({ products, initialCategory }: { products: Product[]; initialCategory?: string }) {
+  const categories = [...new Map(products.map(({ category }) => [category.slug, category])).values()];
+  const [category, setCategory] = useState(initialCategory ?? "");
+  const visibleProducts = category ? products.filter((product) => product.category.slug === category) : products;
   const [quantities, setQuantities] = useState<Record<number, number>>({});
   const [result, setResult] = useState<OrderResult>();
   const [pending, setPending] = useState(false);
@@ -51,12 +54,19 @@ export function Checkout({ products }: { products: Product[] }) {
 
   return (
     <form onSubmit={handleSubmit}>
-      <fieldset disabled={pending} className="grid gap-8 md:grid-cols-[1fr_22rem]">
+      <fieldset disabled={pending} className="shop-grid">
         <section aria-labelledby="products-heading">
           <h2 id="products-heading" className="mb-4 text-2xl font-semibold">Products</h2>
+          <div className="category-filters" role="group" aria-label="Filter products by category">
+            <button type="button" aria-pressed={!category} onClick={() => setCategory("")}>All products</button>
+            {categories.map(({ slug, name }) => (
+              <button key={slug} type="button" aria-pressed={category === slug} onClick={() => setCategory(slug)}>{name}</button>
+            ))}
+          </div>
+          {visibleProducts.length === 0 && <p role="status">There are no products in this category yet.</p>}
           <ul className="grid gap-3">
-            {products.map((product) => (
-              <li key={product.id} className="grid grid-cols-[1fr_auto] gap-4 rounded-lg border border-amber-900/15 bg-white p-4">
+            {visibleProducts.map((product) => (
+              <li key={product.id} className="product-row">
                 <div>
                   <p className="text-sm text-stone-600">{product.category.name}</p>
                   <h3 className="font-semibold">{product.name}</h3>
@@ -78,7 +88,7 @@ export function Checkout({ products }: { products: Product[] }) {
                           const quantity = event.target.valueAsNumber;
                           setQuantities((previous) => ({
                             ...previous,
-                            [product.id]: Number.isInteger(quantity) ? quantity : 0,
+                            [product.id]: Number.isInteger(quantity) ? Math.min(99, Math.max(0, quantity)) : 0,
                           }));
                         }}
                       />
@@ -89,15 +99,25 @@ export function Checkout({ products }: { products: Product[] }) {
             ))}
           </ul>
         </section>
-        <section aria-labelledby="checkout-heading" className="space-y-4 rounded-lg border border-amber-900/15 bg-white p-5 self-start">
+        <section id="checkout" aria-labelledby="checkout-heading" className="checkout-panel space-y-4">
           <h2 id="checkout-heading" className="text-2xl font-semibold">Checkout</h2>
+          {selected.length > 0 && (
+            <ul aria-label="Order summary" className="space-y-2 border-b border-stone-200 pb-4 text-sm">
+              {selected.map(({ id, name }) => (
+                <li key={id} className="flex justify-between gap-3">
+                  <span>{quantities[id]} × {name}</span>
+                  <button type="button" aria-label={`Remove ${name}`} className="underline" onClick={() => setQuantities((previous) => ({ ...previous, [id]: 0 }))}>Remove</button>
+                </li>
+              ))}
+            </ul>
+          )}
           <label className="block">Name<input className={fieldClass} name="customerName" autoComplete="name" required maxLength={120} /></label>
           <label className="block">Email<input className={fieldClass} name="email" type="email" autoComplete="email" required maxLength={254} /></label>
           <label className="block">Phone<input className={fieldClass} name="phone" type="tel" autoComplete="tel" required minLength={7} maxLength={32} /></label>
           <label className="block">Delivery address<textarea className={fieldClass} name="deliveryAddress" autoComplete="street-address" required maxLength={500} /></label>
           <p className="font-medium">Estimated total {price.format(estimate)}</p>
           {selected.length > 50 && <p role="alert">Choose up to 50 different products per order.</p>}
-          <button className="w-full rounded-md bg-amber-900 px-4 py-2 font-semibold text-white disabled:opacity-50" disabled={selected.length === 0 || selected.length > 50}>
+          <button className="button w-full justify-center disabled:opacity-50" disabled={selected.length === 0 || selected.length > 50}>
             {pending ? "Submitting…" : "Place order"}
           </button>
           {result && ("error" in result ? (

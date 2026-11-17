@@ -5,6 +5,9 @@
     "dev": "pnpm -w run api:dev",
     "start": "java -jar build/libs/foodmarkt-0.0.1-SNAPSHOT.jar",
     "package": "pnpm -w run api:package",
-    "test": "pnpm -w run api:test"
+    "test": "pnpm -w run api:test",
+    "migrate": "pnpm -w run api:migrate",
+    "migrate:info": "pnpm -w run api:migrate:info",
+    "migrate:validate": "pnpm -w run api:migrate:validate"
   }
 }

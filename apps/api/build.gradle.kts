@@ -53,3 +53,21 @@ allOpen {
 tasks.withType<Test> {
 	useJUnitPlatform()
 }
+
+springBoot {
+	mainClass = "com.foodmarkt.foodmarkt.FoodmarktApplicationKt"
+}
+
+mapOf(
+	"dbMigrate" to "migrate",
+	"dbMigrationInfo" to "info",
+	"dbMigrationValidate" to "validate",
+).forEach { (taskName, operation) ->
+	tasks.register<JavaExec>(taskName) {
+		group = "database"
+		classpath = sourceSets.main.get().runtimeClasspath
+		javaLauncher = javaToolchains.launcherFor(java.toolchain)
+		mainClass = "com.foodmarkt.foodmarkt.DatabaseMigrationsKt"
+		args(operation)
+	}
+}

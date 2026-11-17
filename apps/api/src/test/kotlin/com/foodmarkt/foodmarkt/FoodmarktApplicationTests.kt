@@ -32,7 +32,7 @@ class FoodmarktApplicationTests {
 	fun catalogSupportsProductLifecycle() {
 		val categories = request("GET", "/api/categories")
 		assertEquals(200, categories.statusCode())
-		listOf("bakery", "chocolate", "breakfast").forEach {
+		listOf("bakery", "chocolate", "breakfast", "pantry", "drinks").forEach {
 			assertTrue(categories.body().contains("\"$it\""))
 		}
 
@@ -43,9 +43,10 @@ class FoodmarktApplicationTests {
 		assertTrue(created.body().contains("\"TRY\""))
 		assertEquals(200, request("GET", location).statusCode())
 
-		val filtered = request("GET", "/api/products?category=bakery&page=0&size=1")
+		val filtered = request("GET", "/api/products?category=bakery&page=0&size=100")
 		assertEquals(200, filtered.statusCode())
 		assertTrue(filtered.body().contains("\"Sourdough\""))
+		assertTrue(filtered.body().contains("\"Sesame Simit\""))
 		assertEquals(400, request("GET", "/api/products?size=101").statusCode())
 		assertEquals(400, request("POST", "/api/products", product.replace("90.50", "-1")).statusCode())
 		assertEquals(404, request("POST", "/api/products", product.replace("bakery", "unknown")).statusCode())

@@ -13,7 +13,10 @@
     "api:test": "pnpm run api:gradle test",
     "api:build": "pnpm run api:gradle build",
     "api:package": "pnpm run api:gradle bootJar",
-    "api:clean": "pnpm run api:gradle clean"
+    "api:clean": "pnpm run api:gradle clean",
+    "api:migrate": "node --env-file-if-exists=.env apps/api/migrate.mjs dbMigrate",
+    "api:migrate:info": "node --env-file-if-exists=.env apps/api/migrate.mjs dbMigrationInfo",
+    "api:migrate:validate": "node --env-file-if-exists=.env apps/api/migrate.mjs dbMigrationValidate"
   },
   "devDependencies": {
     "pnpm": "12.16.1",
